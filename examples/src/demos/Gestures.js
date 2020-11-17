@@ -10,19 +10,18 @@ function Obj() {
     rotation: [0, 0, 0],
     config: { mass: 3, friction: 40, tension: 800 },
   }))
-  const bind = useDrag(
-    ({ offset: [x, y], vxvy: [vx, vy], down, ...props }) => {
-      const aspect = viewport().factor
-      set({
-        position: [x / aspect, -y / aspect, 0],
-        rotation: [y / aspect, x / aspect, 0],
-      })
-    },
-    { eventOptions: { pointer: true } }
-  )
+
+  const bind = useDrag(({ event, first, offset: [x, y], vxvy: [vx, vy], down, ...props }) => {
+    const aspect = viewport().factor
+    console.log('yo')
+    set({
+      position: [x / aspect, -y / aspect, 0],
+      rotation: [y / aspect, x / aspect, 0],
+    })
+  })
 
   return (
-    <a.mesh {...spring} {...bind()} castShadow>
+    <a.mesh {...bind()} {...spring} castShadow>
       <dodecahedronBufferGeometry attach="geometry" args={[1.4, 0]} />
       <meshNormalMaterial attach="material" />
     </a.mesh>

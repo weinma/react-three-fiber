@@ -411,28 +411,36 @@ export const useCanvas = (props: UseCanvasProps): DomEventHandlers => {
   const handleIntersects = useCallback(
     (intersections: Intersection[], event: DomEvent, fn: (event: DomEvent) => void): Intersection[] => {
       // If anything has been found, forward it to the event listeners
+      const target = event.target as any
+      if (!target.__patched) {
+        target.__patched = true
+        target.__setPointerCapture = target.setPointerCapture
+      }
+
       if (intersections.length) {
         const unprojectedPoint = temp.set(mouse.x, mouse.y, 0).unproject(state.current.camera)
         const delta = event.type === 'click' ? calculateDistance(event) : 0
         const releasePointerCapture = (id: any) => (event.target as any).releasePointerCapture(id)
         const localState = { stopped: false, captured: false }
 
-        for (const hit of intersections) {
-          const setPointerCapture = (id: any) => {
-            // If the hit is going to be captured flag that we're in captured state
-            if (!localState.captured) {
-              localState.captured = true
-              // The captured hit array is reset to collect hits
-              state.current.captured = []
-            }
+        target.setPointerCapture = (id: any) => {
+          // If the hit is going to be captured flag that we're in captured state
+          if (!localState.captured) {
+            localState.captured = true
+            // The captured hit array is reset to collect hits
+            state.current.captured = []
+          }
+          for (const hit of intersections) {
             // Push hits to the array
             if (state.current.captured) {
               state.current.captured.push(hit)
             }
-            // Call the original event now
-            ;(event.target as any).setPointerCapture(id)
           }
+          // Call the original event now
+          target.__setPointerCapture(id)
+        }
 
+        for (const hit of intersections) {
           const raycastEvent = {
             ...event,
             ...hit,
@@ -458,9 +466,8 @@ export const useCanvas = (props: UseCanvasProps): DomEventHandlers => {
                 }
               }
             },
-            target: { ...event.target, setPointerCapture, releasePointerCapture },
-            currentTarget: { ...event.currentTarget, setPointerCapture, releasePointerCapture },
-            sourceEvent: event,
+            target,
+            currentTarget: target,
           }
 
           fn(raycastEvent)
@@ -671,7 +678,7 @@ export const useCanvas = (props: UseCanvasProps): DomEventHandlers => {
 function dispose(obj: any) {
   if (obj.dispose) obj.dispose()
   for (const p in obj) {
-    if (typeof p === 'object' && (p as any).dispose) (p as any).dispose()
+    if (typeof p === 'object' && 'dispose' in p) (p as any).dispose()
     delete obj[p]
   }
 }

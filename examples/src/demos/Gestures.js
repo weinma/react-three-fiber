@@ -13,7 +13,7 @@ function Obj() {
 
   const bind = useDrag(({ event, first, offset: [x, y], vxvy: [vx, vy], down, ...props }) => {
     const aspect = viewport().factor
-    console.log('yo')
+    if (first) event.target.addEventListener('pointermove', () => console.log('hello'))
     set({
       position: [x / aspect, -y / aspect, 0],
       rotation: [y / aspect, x / aspect, 0],
@@ -21,10 +21,10 @@ function Obj() {
   })
 
   return (
-    <a.mesh {...bind()} {...spring} castShadow>
+    <mesh {...bind()} castShadow>
       <dodecahedronBufferGeometry attach="geometry" args={[1.4, 0]} />
       <meshNormalMaterial attach="material" />
-    </a.mesh>
+    </mesh>
   )
 }
 

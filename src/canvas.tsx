@@ -267,6 +267,7 @@ export const useCanvas = (props: UseCanvasProps): DomEventHandlers => {
     state.current.gl = gl
     state.current.concurrent = concurrent
     state.current.noEvents = noEvents
+
     // Make viewport backwards compatible
     state.current.viewport = getCurrentViewport as ViewportData
   }, [invalidateFrameloop, vr, concurrent, noEvents, ready, size, defaultCam, gl])
@@ -411,34 +412,37 @@ export const useCanvas = (props: UseCanvasProps): DomEventHandlers => {
   const handleIntersects = useCallback(
     (intersections: Intersection[], event: DomEvent, fn: (event: DomEvent) => void): Intersection[] => {
       // If anything has been found, forward it to the event listeners
-      const target = event.target as any
-      if (!target.__patched) {
-        target.__patched = true
-        target.__setPointerCapture = target.setPointerCapture
-      }
 
       if (intersections.length) {
         const unprojectedPoint = temp.set(mouse.x, mouse.y, 0).unproject(state.current.camera)
         const delta = event.type === 'click' ? calculateDistance(event) : 0
-        const releasePointerCapture = (id: any) => (event.target as any).releasePointerCapture(id)
         const localState = { stopped: false, captured: false }
 
-        target.setPointerCapture = (id: any) => {
-          // If the hit is going to be captured flag that we're in captured state
-          if (!localState.captured) {
-            localState.captured = true
-            // The captured hit array is reset to collect hits
-            state.current.captured = []
-          }
-          for (const hit of intersections) {
-            // Push hits to the array
-            if (state.current.captured) {
-              state.current.captured.push(hit)
+        const target = new Proxy(event.target as any, {
+          get: function (obj, prop) {
+            if (prop === 'setPointerCapture') {
+              return (id: any) => {
+                // If the hit is going to be captured flag that we're in captured state
+                if (!localState.captured) {
+                  localState.captured = true
+                  // The captured hit array is reset to collect hits
+                  state.current.captured = []
+                }
+                for (const hit of intersections) {
+                  // Push hits to the array
+                  if (state.current.captured) {
+                    state.current.captured.push(hit)
+                  }
+                }
+                // Call the original event now
+                obj.setPointerCapture(id)
+              }
             }
-          }
-          // Call the original event now
-          target.__setPointerCapture(id)
-        }
+            const value = obj[prop]
+            if (typeof value === 'function') return value.bind(obj)
+            return obj[prop]
+          },
+        })
 
         for (const hit of intersections) {
           const raycastEvent = {

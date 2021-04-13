@@ -124,8 +124,8 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
       // Event-handlers ...
       //   are functions, that
       //   start with "on", and
-      //   contain the name "Pointer", "Click", "ContextMenu", or "Wheel"
-      if (is.fun(newProps[objectKeys[i]]) && /^on(Pointer|Click|ContextMenu|Wheel)/.test(objectKeys[i])) {
+      //   contain the name "Pointer", "Click", "DoubleClick", "ContextMenu", or "Wheel"
+      if (is.fun(newProps[objectKeys[i]]) && /^on(Pointer|Click|DoubleClick|ContextMenu|Wheel)/.test(objectKeys[i])) {
         handlers.push(objectKeys[i])
       }
     }
@@ -206,7 +206,7 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
             }
           }
 
-          // Special treatment for objects with support for set/copy
+          // Special treatment for objects with support for set/copy, and layers
           if (targetProp && targetProp.set && (targetProp.copy || targetProp instanceof THREE.Layers)) {
             // If value is an array
             if (Array.isArray(value)) {
@@ -231,6 +231,8 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
               const isColor = targetProp instanceof THREE.Color
               // Allow setting array scalars
               if (!isColor && targetProp.setScalar) targetProp.setScalar(value)
+              // Layers have no copy function, we must therefore copy the mask property
+              if (targetProp instanceof THREE.Layers && value instanceof THREE.Layers) targetProp.mask = value.mask
               // Otherwise just set ...
               else targetProp.set(value)
               // Auto-convert sRGB colors, for now ...
@@ -412,23 +414,29 @@ function createRenderer<TCanvas>(roots: Map<TCanvas, Root>) {
       //
       // Since disposal is recursive, we can check the optional dispose arg, which will be undefined
       // when the reconciler calls it, but then carry our own check recursively
-      const shouldDispose = dispose === undefined ? child.dispose !== null && !child.__r3f.instance : dispose
+      const isInstance = child.__r3f?.instance
+      const shouldDispose = dispose === undefined ? child.dispose !== null && !isInstance : dispose
 
-      // Remove nested child objects
-      removeRecursive(child.__r3f.objects, child, shouldDispose)
-      removeRecursive(child.children, child, shouldDispose)
+      // Remove nested child objects. Primitives should not have objects and children that are
+      // attached to them declaratively ...
+      if (!isInstance) {
+        removeRecursive(child.__r3f?.objects, child, shouldDispose)
+        removeRecursive(child.children, child, shouldDispose)
+      }
+
+      // Remove references
+      if (child.__r3f) {
+        delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).root
+        delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).objects
+        delete child.__r3f.handlers
+        delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).memoizedProps
+        delete (child as Partial<Instance>).__r3f
+      }
 
       // Dispose item whenever the reconciler feels like it
       if (shouldDispose && child.dispose && child.type !== 'Scene') {
         run(idlePriority, () => child.dispose())
       }
-
-      // Remove references
-      delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).root
-      delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).objects
-      delete child.__r3f.handlers
-      delete ((child as Partial<Instance>).__r3f as Partial<LocalState>).memoizedProps
-      delete (child as Partial<Instance>).__r3f
 
       invalidateInstance(parentInstance)
     }

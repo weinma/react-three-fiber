@@ -8,6 +8,24 @@
 [![ETH](https://img.shields.io/badge/ETH-f5f5f5?style=flat&colorA=000000&colorB=000000)](https://blockchain.com/eth/address/0x6E3f79Ea1d0dcedeb33D3fC6c34d2B1f156F2682)
 [![BTC](https://img.shields.io/badge/BTC-f5f5f5?style=flat&colorA=000000&colorB=000000)](https://blockchain.com/btc/address/36fuguTPxGCNnYZSRdgdh6Ea94brCAjMbH)
 
+<p align="center">
+  <a href="https://codesandbox.io/embed/r3f-game-i2160"><img width="274" src="https://i.imgur.com/VydCh6W.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-gamma-correction-kmb9i"><img width="274" src="https://i.imgur.com/e6NhRz6.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-montage-jz9l97qn89"><img width="274" src="https://i.imgur.com/nxRStP8.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-sparks-sbf2i"><img width="274" src="https://i.imgur.com/Fk44Tu6.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-instanced-colors-8fo01"><img width="274" src="https://i.imgur.com/daJIDVE.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-moksha-f1ixt"><img width="274" src="https://i.imgur.com/ltznOJ1.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-bones-3i7iu"><img width="274" src="https://i.imgur.com/OZdSyQy.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-floating-diamonds-prb9t"><img width="274" src="https://i.imgur.com/WWDbcWG.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-volumetric-light-w633u"><img width="274" src="https://i.imgur.com/7E3XKSG.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-particles-ii-pjcc1"><img width="274" src="https://i.imgur.com/QG14IAC.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-gltf-fonts-c671i"><img width="274" src="https://i.imgur.com/SHPhIls.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-cannon-physics-nr84m"><img width="274" src="https://i.imgur.com/M9rupWP.gif" /></a>
+  <a href="https://codesandbox.io/embed/wonderful-chandrasekhar-8l9rrj36j0"><img width="274" src="https://i.imgur.com/HSTGdcO.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-train-l900i"><img width="274" src="https://i.imgur.com/B3AzZVH.gif" /></a>
+  <a href="https://codesandbox.io/embed/r3f-particles-i-q4d2v"><img width="274" src="https://i.imgur.com/XscsWgu.gif" /></a>
+</p>
+
 react-three-fiber is a <a href="https://reactjs.org/docs/codebase-overview.html#renderers">React renderer</a> for threejs.
 
 ```bash
@@ -143,7 +161,7 @@ You need to be versed in both React and Threejs before rushing into this. If you
 1. Make sure you have a [basic grasp of Threejs](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene). Keep that site open.
 2. When you know what a scene is, a camera, mesh, geometry, material, fork the [demo above](https://github.com/react-spring/react-three-fiber#what-does-it-look-like).
 3. [Look up](https://threejs.org/docs/index.html#api/en/objects/Mesh) the JSX elements that you see (mesh, ambientLight, etc), _all_ threejs exports are native to three-fiber.
-4. Try changing some values, scroll though our [Api](/markdown/api.md) to see what the various settings and hooks do.
+4. Try changing some values, scroll through our [Api](/markdown/api.md) to see what the various settings and hooks do.
 
 Some reading material:
 
